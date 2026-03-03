@@ -45,10 +45,10 @@ export function Footer() {
           <div className="flex flex-col gap-4">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">Company</h3>
             <div className="flex flex-col gap-2.5">
-              <Link href="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">About Us</Link>
-              <Link href="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Careers</Link>
-              <Link href="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Press</Link>
-              <Link href="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Contact</Link>
+              <Link href="/about" className="text-sm text-muted-foreground transition-colors hover:text-foreground">About Us</Link>
+              <Link href="/contact" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Contact</Link>
+              <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Privacy Policy</Link>
+              <Link href="/shop" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Shop</Link>
             </div>
           </div>
 
@@ -74,9 +74,9 @@ export function Footer() {
             {'2026 Ultima-Tech. All rights reserved.'}
           </p>
           <div className="flex gap-6">
-            <Link href="/" className="text-xs text-muted-foreground transition-colors hover:text-foreground">Privacy</Link>
-            <Link href="/" className="text-xs text-muted-foreground transition-colors hover:text-foreground">Terms</Link>
-            <Link href="/" className="text-xs text-muted-foreground transition-colors hover:text-foreground">Cookies</Link>
+            <Link href="/privacy" className="text-xs text-muted-foreground transition-colors hover:text-foreground">Privacy</Link>
+            <Link href="/about" className="text-xs text-muted-foreground transition-colors hover:text-foreground">About</Link>
+            <Link href="/contact" className="text-xs text-muted-foreground transition-colors hover:text-foreground">Contact</Link>
           </div>
         </div>
       </div>

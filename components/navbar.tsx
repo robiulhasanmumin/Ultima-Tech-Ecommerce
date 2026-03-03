@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
 import {
@@ -17,11 +18,13 @@ import { ThemeToggle } from '@/components/theme-toggle'
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Shop', href: '/shop' },
-  { label: 'Categories', href: '/shop' },
-  { label: 'Support', href: '/' },
+  { label: 'About Us', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'Privacy Policy', href: '/privacy' },
 ]
 
 export function Navbar() {
+  const pathname = usePathname()
   const { data: session } = useSession()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -35,15 +38,25 @@ export function Navbar() {
 
         {/* Desktop Nav */}
         <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="text-sm text-muted-foreground transition-all duration-300 hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`relative text-sm transition-all duration-300 ${
+                  isActive
+                    ? 'font-medium text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-primary" />
+                )}
+              </Link>
+            )
+          })}
         </div>
 
         {/* Auth / User */}
@@ -124,16 +137,23 @@ export function Navbar() {
               <span className="text-sm text-muted-foreground">Theme</span>
               <ThemeToggle />
             </div>
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`text-sm transition-colors ${
+                    isActive
+                      ? 'font-medium text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
             {session ? (
               <>
                 <Link
