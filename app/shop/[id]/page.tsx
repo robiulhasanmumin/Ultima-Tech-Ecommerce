@@ -1,4 +1,3 @@
-import { Providers } from '@/components/providers'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { ProductDetail } from '@/components/shop/product-detail'
@@ -16,12 +15,12 @@ export default async function ProductPage({
   const { id } = await params
 
   return (
-    <Providers>
+    <>
       <Navbar />
       <main className="min-h-screen pt-24">
         <ProductDetail id={id} />
       </main>
       <Footer />
-    </Providers>
+    </>
   )
 }

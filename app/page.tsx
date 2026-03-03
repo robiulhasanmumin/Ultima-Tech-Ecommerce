@@ -1,4 +1,3 @@
-import { Providers } from '@/components/providers'
 import { Navbar } from '@/components/navbar'
 import { Hero } from '@/components/landing/hero'
 import { Categories } from '@/components/landing/categories'
@@ -9,7 +8,7 @@ import { Footer } from '@/components/footer'
 
 export default function Home() {
   return (
-    <Providers>
+    <>
       <Navbar />
       <main>
         <Hero />
@@ -19,6 +18,6 @@ export default function Home() {
         <Newsletter />
       </main>
       <Footer />
-    </Providers>
+    </>
   )
 }
