@@ -12,6 +12,7 @@ import {
   LogOut,
   ChevronDown,
 } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -47,6 +48,7 @@ export function Navbar() {
 
         {/* Auth / User */}
         <div className="hidden items-center gap-4 md:flex">
+          <ThemeToggle />
           {session ? (
             <div className="relative">
               <button
@@ -118,6 +120,10 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t border-border bg-background/95 px-6 pb-6 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-4 pt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.label}
