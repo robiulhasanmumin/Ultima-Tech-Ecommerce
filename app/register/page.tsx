@@ -1,17 +1,17 @@
-import LoginForm from '@/components/auth/login-form'
+import RegisterForm from '@/components/auth/register'
 import { Navbar } from '@/components/navbar'
- 
+  
 export const metadata = {
-  title: 'Login | Ultima-Tech',
-  description: 'Sign in to your Ultima-Tech account.',
+  title: 'Register | Ultima-Tech',
+  description: 'Create a new Ultima-Tech account.',
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <>
       <Navbar />
       <main className="flex min-h-screen items-center justify-center px-6 pt-20">
-        <LoginForm/>
+        <RegisterForm />
       </main>
     </>
   )

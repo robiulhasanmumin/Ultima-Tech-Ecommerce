@@ -17,7 +17,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 
 const navLinks = [
   { label: 'Home', href: '/' },
-  { label: 'Shop', href: '/shop' },
+  { label: 'Products', href: '/shop' },
   { label: 'About Us', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'Privacy Policy', href: '/privacy' },
@@ -36,8 +36,7 @@ export function Navbar() {
           ULTIMA<span className="text-primary">-TECH</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden items-center gap-8 md:flex">
+         <div className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => {
             const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
             return (
@@ -59,8 +58,7 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Auth / User */}
-        <div className="hidden items-center gap-4 md:flex">
+         <div className="hidden items-center gap-4 lg:flex">
           <ThemeToggle />
           {session ? (
             <div className="relative">
@@ -119,19 +117,19 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile & Tab Menu Toggle - এখন 1024px এর নিচে গেলেই (lg:hidden) এটি আসবে */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-foreground md:hidden"
+          className="text-foreground lg:hidden"
           aria-label="Toggle navigation menu"
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile & Tab Menu - 1024px এর নিচের সব ডিভাইসের জন্য */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background/95 px-6 pb-6 backdrop-blur-xl md:hidden">
+        <div className="border-t border-border bg-background/95 px-6 pb-6 backdrop-blur-xl lg:hidden">
           <div className="flex flex-col gap-4 pt-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Theme</span>
