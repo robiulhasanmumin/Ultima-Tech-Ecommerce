@@ -1,34 +1,80 @@
 'use client'
 
+import { useState, useEffect } from 'react'  
 import Link from 'next/link'
-import useSWR, { mutate } from 'swr'
 import { LayoutDashboard, Eye, Trash2 } from 'lucide-react'
-import toast from 'react-hot-toast'
-import type { Product } from '@/lib/products'
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
-
+import Swal from 'sweetalert2'
+ 
 export function ManageProductsTable() {
-  const { data: products = [], isLoading } = useSWR<Product[]>('/api/products', fetcher)
+   const [products, setProducts] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return
-
+   const fetchProducts = async () => {
+    setIsLoading(true)
     try {
-      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
+      const res = await fetch('/api/products', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       if (res.ok) {
-        toast.success(`"${title}" deleted successfully!`)
-        mutate('/api/products')
-      } else {
-        toast.error('Failed to delete product.')
+        const data = await res.json()
+        setProducts(data)
       }
-    } catch {
-      toast.error('Something went wrong.')
+    } catch (error) {
+      console.error('Fetching error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+   useEffect(() => {
+    fetchProducts()
+  }, [])
+
+   const handleDelete = async (id: string, title: string) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete "${title}".`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!',
+      background: '#1f2937',
+      color: '#fff'
+    })
+
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`/api/products/${id}`, { 
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (res.ok) {
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Product has been removed.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+          })
+           setProducts(prev => prev.filter(item => item.id !== id))
+        } else {
+          Swal.fire('Error', 'Failed to delete product.', 'error')
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Something went wrong.', 'error')
+      }
     }
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6">
+    <div className="mx-auto max-w-7xl px-6 py-8">
       <div className="mb-8">
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
           <LayoutDashboard className="h-7 w-7 text-primary" />

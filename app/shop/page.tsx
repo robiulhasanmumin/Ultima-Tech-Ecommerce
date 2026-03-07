@@ -1,7 +1,7 @@
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { ShopContent } from '@/components/shop/shop-content'
-
+import ShopContent from '@/components/shop/shop-content'
+ 
 export const metadata = {
   title: 'Shop | Ultima-Tech',
   description: 'Explore our collection of premium tech gadgets.',

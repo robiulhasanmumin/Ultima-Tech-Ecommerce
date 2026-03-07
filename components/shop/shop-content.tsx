@@ -1,28 +1,47 @@
-'use client'
+'use client'  
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Search, ArrowRight, Tag, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import useSWR from 'swr'
-import { Search, ArrowRight } from 'lucide-react'
-import type { Product } from '@/lib/products'
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
-
-const categories = ['All', 'Audio', 'Wearables', 'Computing']
-
-export function ShopContent() {
-  const { data: products = [] } = useSWR<Product[]>('/api/products', fetcher)
+ export default function ShopContent() {
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
 
+  const categories = ['All', 'Audio', 'Wearables', 'Computing']
+
+   useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch('/api/products') 
+        const data = await res.json()
+        setProducts(data)
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
+
   const filtered = products.filter((p) => {
-    const matchesSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.bio.toLowerCase().includes(search.toLowerCase())
+    const matchesSearch =p.title?.toLowerCase().includes(search.toLowerCase()) 
+      
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory
     return matchesSearch && matchesCategory
   })
+
+  if (loading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
@@ -33,7 +52,7 @@ export function ShopContent() {
           Explore Innovation
         </h1>
         <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-          Browse our curated collection of premium tech gadgets designed to elevate your everyday experience.
+          Browse our curated collection of premium tech gadgets.
         </p>
       </div>
 
@@ -46,7 +65,7 @@ export function ShopContent() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products..."
-            className="w-full rounded-lg border border-border bg-card py-3 pl-11 pr-4 text-sm text-card-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+            className="w-full rounded-lg border border-border bg-card py-3 pl-11 pr-4 text-sm text-card-foreground focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -58,7 +77,7 @@ export function ShopContent() {
               className={`rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
                 activeCategory === cat
                   ? 'bg-primary text-primary-foreground'
-                  : 'border border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground'
+                  : 'border border-border bg-card text-muted-foreground hover:border-primary/50'
               }`}
             >
               {cat}
@@ -71,12 +90,12 @@ export function ShopContent() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filtered.map((product) => (
           <div
-            key={product.id}
+            key={product.id || product._id}
             className="group overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:scale-[1.02] hover:border-primary/50"
           >
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div className="relative aspect-[4/3] overflow-hidden bg-secondary/20">
               <Image
-                src={product.image}
+                src={product.image || '/images/placeholder.jpg'}
                 alt={product.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -84,16 +103,21 @@ export function ShopContent() {
             </div>
             <div className="flex flex-col gap-3 p-6">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="text-lg font-semibold text-card-foreground">{product.title}</h3>
+                <div>
+                  <h3 className="text-lg font-semibold text-card-foreground">{product.title}</h3>
+                  <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                    <Tag className="h-3 w-3" /> {product.category}
+                  </p>
+                </div>
                 <span className="whitespace-nowrap rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">
                   ${product.price}
                 </span>
               </div>
               <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                {product.bio}. {product.description.slice(0, 80)}...
+                {product.bio}
               </p>
               <Link
-                href={`/shop/${product.id}`}
+                href={`/shop/${product.id || product._id}`}
                 className="group/btn mt-1 inline-flex items-center gap-2 text-sm font-medium text-primary transition-all duration-300 hover:gap-3"
               >
                 View Details
@@ -106,7 +130,7 @@ export function ShopContent() {
 
       {filtered.length === 0 && (
         <div className="py-20 text-center">
-          <p className="text-lg text-muted-foreground">No products found matching your criteria.</p>
+          <p className="text-lg text-muted-foreground">No products found matching your search.</p>
         </div>
       )}
     </div>

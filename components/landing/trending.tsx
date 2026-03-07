@@ -1,35 +1,30 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Eye } from 'lucide-react'
+import { dbConnect, collections } from '@/lib/dbConnect'  
 
-const trendingProducts = [
-  {
-    id: '1',
-    title: 'Nova Pro Headphones',
-    price: 349,
-    image: '/images/product-headphones.jpg',
-  },
-  {
-    id: '6',
-    title: 'Pulse Fit Watch',
-    price: 599,
-    image: '/images/product-watch.jpg',
-  },
-  {
-    id: '2',
-    title: 'Zenith UltraBook',
-    price: 1999,
-    image: '/images/product-laptop.jpg',
-  },
-  {
-    id: '5',
-    title: 'Echo Sphere Speaker',
-    price: 449,
-    image: '/images/product-speaker.jpg',
-  },
-]
+export async function Trending() {
+  let trendingProducts = [];
 
-export function Trending() {
+  try {
+    const productsCollection = await dbConnect(collections.PRODUCTS);
+    
+     const data = await productsCollection
+      .find({})
+      .sort({ price: -1 }) 
+      .limit(4)
+      .toArray();
+
+     trendingProducts = data.map(product => ({
+      ...product,
+      id: product._id.toString(),
+    }));
+  } catch (error) {
+    console.error("Failed to fetch trending products:", error);
+  }
+
+   if (trendingProducts.length === 0) return null;
+
   return (
     <section className="bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
@@ -41,14 +36,14 @@ export function Trending() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {trendingProducts.map((product) => (
+          {trendingProducts.map((product: any) => (
             <div
               key={product.id}
               className="group overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:scale-105 hover:border-primary/50"
             >
-              <div className="relative aspect-square overflow-hidden">
+              <div className="relative aspect-square overflow-hidden bg-secondary/50">
                 <Image
-                  src={product.image}
+                  src={product.image || '/images/placeholder.jpg'}  
                   alt={product.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -64,8 +59,13 @@ export function Trending() {
                 </Link>
               </div>
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-card-foreground">{product.title}</h3>
-                <p className="mt-1 text-lg font-bold text-primary">${product.price}</p>
+                <div className="flex justify-between items-start gap-2">
+                   <div>
+                      <h3 className="text-sm font-semibold text-card-foreground">{product.title}</h3>
+                      <p className="text-xs text-muted-foreground">{product.category}</p>
+                   </div>
+                   <p className="text-lg font-bold text-primary">${product.price}</p>
+                </div>
               </div>
             </div>
           ))}

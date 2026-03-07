@@ -2,14 +2,28 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'  
 import useSWR from 'swr'
+import Swal from 'sweetalert2' 
 import { ArrowLeft, CheckCircle, XCircle, Tag } from 'lucide-react'
 import type { Product } from '@/lib/products'
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 export function ProductDetail({ id }: { id: string }) {
+  const router = useRouter() // Router instance
   const { data: product, error, isLoading } = useSWR<Product>(`/api/products/${id}`, fetcher)
+
+   const handleAddToCart = () => {
+    Swal.fire({
+      title: 'Success!',
+      text: `${product?.title} has been added to your cart.`,
+      icon: 'success',
+      confirmButtonColor: '#3b82f6',  
+      timer: 2000,
+      showConfirmButton: false,
+     })
+  }
 
   if (isLoading) {
     return (
@@ -24,26 +38,19 @@ export function ProductDetail({ id }: { id: string }) {
       <div className="mx-auto max-w-7xl px-6 py-20 text-center">
         <h2 className="text-2xl font-bold text-foreground">Product Not Found</h2>
         <p className="mt-2 text-muted-foreground">The product you are looking for does not exist.</p>
-        <Link
-          href="/shop"
+        <button
+          onClick={() => router.back()}  
           className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all duration-300 hover:bg-primary/90"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Shop
-        </Link>
+          Go Back
+        </button>
       </div>
     )
   }
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
-      <Link
-        href="/shop"
-        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Shop
-      </Link>
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* Image Gallery */}
@@ -117,15 +124,19 @@ export function ProductDetail({ id }: { id: string }) {
           <div className="h-px bg-border" />
 
           <div className="flex flex-wrap gap-4">
-            <button className="flex-1 rounded-lg bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:scale-105 hover:bg-primary/90">
+            <button 
+              onClick={handleAddToCart} // Click handler
+              className="flex-1 rounded-lg bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:scale-105 hover:bg-primary/90"
+            >
               Add to Cart
             </button>
-            <Link
-              href="/shop"
-              className="rounded-lg border border-border px-8 py-3.5 text-center text-sm font-semibold text-foreground transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:bg-secondary"
+            <button
+              onClick={() => router.back()}
+              className="rounded-lg border border-border px-8 py-3.5 text-center text-sm font-semibold text-foreground transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:bg-secondary flex items-center gap-2"
             >
-              Back to Shop
-            </Link>
+              <ArrowLeft className="h-4 w-4" />
+              Go to Back
+            </button>
           </div>
         </div>
       </div>
