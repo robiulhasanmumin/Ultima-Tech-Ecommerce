@@ -8,14 +8,31 @@ export function ContactForm() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => {
-      toast.success('Message sent! We will get back to you soon.')
-      setForm({ name: '', email: '', subject: '', message: '' })
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      })
+
+      if (res.ok) {
+        toast.success('Message sent! We will get back to you soon.')
+        setForm({ name: '', email: '', subject: '', message: '' })
+      } else {
+        const data = await res.json()
+        toast.error(data.error || 'Failed to send message.')
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.')
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   const inputClass =
