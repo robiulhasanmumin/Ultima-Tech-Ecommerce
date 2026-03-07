@@ -1,22 +1,37 @@
-'use client'  
+'use client'
 
 import { useState, useEffect } from 'react'
 import { Search, ArrowRight, Tag, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'  
 
- export default function ShopContent() {
+export default function ShopContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+   const categoryFromUrl = searchParams.get('category') || 'All'
+
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeCategory, setActiveCategory] = useState(categoryFromUrl)  
 
   const categories = ['All', 'Audio', 'Wearables', 'Computing']
 
-   useEffect(() => {
+   const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat)
+    if (cat === 'All') {
+      router.push('/shop')  
+    } else {
+      router.push(`?category=${cat}`)
+    }
+  }
+
+  useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch('/api/products') 
+        const res = await fetch('/api/products')
         const data = await res.json()
         setProducts(data)
       } catch (error) {
@@ -29,8 +44,7 @@ import Link from 'next/link'
   }, [])
 
   const filtered = products.filter((p) => {
-    const matchesSearch =p.title?.toLowerCase().includes(search.toLowerCase()) 
-      
+    const matchesSearch = p.title?.toLowerCase().includes(search.toLowerCase())
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory
     return matchesSearch && matchesCategory
   })
@@ -73,7 +87,7 @@ import Link from 'next/link'
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => handleCategoryChange(cat)}  
               className={`rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
                 activeCategory === cat
                   ? 'bg-primary text-primary-foreground'

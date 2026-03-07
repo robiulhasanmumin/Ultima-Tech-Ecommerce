@@ -33,45 +33,59 @@ export function ManageProductsTable() {
     fetchProducts()
   }, [])
 
-   const handleDelete = async (id: string, title: string) => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: `You are about to delete "${title}".`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, delete it!',
-      background: '#1f2937',
-      color: '#fff'
-    })
+const handleDelete = async (id: string, title: string) => {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: `You are about to delete "${title}".`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, delete it!',
+    background: '#1f2937',
+    color: '#fff'
+  })
 
-    if (result.isConfirmed) {
-      try {
-        const res = await fetch(`/api/products/${id}`, { 
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+  if (result.isConfirmed) {
+    try {
+      const res = await fetch(`/api/products/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+       const data = await res.json()
+
+      if (res.ok) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Product has been removed.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
         })
-
-        if (res.ok) {
-          Swal.fire({
-            title: 'Deleted!',
-            text: 'Product has been removed.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false,
-          })
-           setProducts(prev => prev.filter(item => item.id !== id))
-        } else {
-          Swal.fire('Error', 'Failed to delete product.', 'error')
-        }
-      } catch (error) {
-        Swal.fire('Error', 'Something went wrong.', 'error')
+        setProducts(prev => prev.filter(item => item.id !== id))
+      } 
+       else if (res.status === 403) {
+        Swal.fire({
+          title: 'Restricted!',
+          text: data.error || 'The first 6 essential products cannot be deleted.',
+          icon: 'error',
+          confirmButtonColor: '#ef4444',
+          background: '#1f2937',
+          color: '#fff'
+        })
+      } 
+      else {
+        Swal.fire('Error', data.error || 'Failed to delete product.', 'error')
       }
+    } catch (error) {
+      Swal.fire('Error', 'Something went wrong.', 'error')
     }
   }
+}
+
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
