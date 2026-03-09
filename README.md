@@ -40,6 +40,6 @@
 ### 2. Installation
 Clone the repository and install dependencies:
 ```bash
-git clone "url"
+git clone https://github.com/robiulhasanmumin/Ultima-Tech-Ecommerce.git
 cd ultima-tech
 npm install
