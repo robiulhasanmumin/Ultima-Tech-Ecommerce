@@ -5,7 +5,7 @@ import heroimg from '@/public/gaget.png'
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden pt-28 pb-12 lg:pt-0 lg:pb-0">
+    <section className="relative flex min-h-screen items-center overflow-hidden pt-28 pb-12 lg:pt-0 lg:pb-0 lg:mt-5">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#4f46e520_0%,_transparent_50%)]" />
 
