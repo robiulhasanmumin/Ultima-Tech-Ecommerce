@@ -1,27 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'  
 import Link from 'next/link'
-import { signIn } from 'next-auth/react' // লগইন করার জন্য ইমপোর্ট
+import { signIn } from 'next-auth/react'  
 import { Lock, Mail, User, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import Swal from 'sweetalert2'
 
 export default function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()  
+  
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
+   const callbackUrl = searchParams.get('callbackUrl') || '/'
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      // ১. প্রথমে ইউজার রেজিস্ট্রেশন করা
-      const res = await fetch('/api/register', {
+       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
@@ -30,11 +33,10 @@ export default function RegisterForm() {
       const data = await res.json()
 
       if (res.ok) {
-        // ২. রেজিস্ট্রেশন সফল হলে অটোমেটিক লগইন (NextAuth Session তৈরি করা)
-        const loginRes = await signIn('credentials', {
+          const loginRes = await signIn('credentials', {
           email,
           password,
-          redirect: false, // আমরা ম্যানুয়ালি রিডাইরেক্ট করবো
+          redirect: false,  
         })
 
         if (loginRes?.ok) {
@@ -47,10 +49,9 @@ export default function RegisterForm() {
             showConfirmButton: false
           })
           
-          // ৩. সেশন আপডেট হওয়ার জন্য একটু সময় দিয়ে হোম পেজে পাঠানো
-          setTimeout(() => {
-            router.push('/')
-            router.refresh() // সেশন স্টেট রিফ্রেশ করার জন্য
+           setTimeout(() => {
+             router.push(callbackUrl)
+            router.refresh()  
           }, 500)
         }
       } else {
@@ -146,7 +147,7 @@ export default function RegisterForm() {
             <div className="mt-8 text-center border-t border-border/50 pt-6">
               <p className="text-sm text-muted-foreground">
                 Already have an account?{' '}
-                <Link href="/login" className="font-bold text-primary hover:underline">Sign in here</Link>
+                 <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary hover:underline">Sign in here</Link>
               </p>
             </div>
           </div>

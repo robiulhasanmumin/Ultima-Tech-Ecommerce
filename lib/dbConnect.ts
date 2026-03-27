@@ -11,12 +11,10 @@ const client = new MongoClient(uri, {
   }
 });
 
-// কানেকশন প্রমিজটি ধরে রাখার জন্য
-let clientPromise;
+ let clientPromise;
 
 export const dbConnect = async (cname) => {
-  // যদি আগে থেকে কানেক্ট না থাকে, তবে কানেক্ট করবে
-  if (!clientPromise) {
+   if (!clientPromise) {
     clientPromise = client.connect();
   }
   
@@ -26,5 +24,7 @@ export const dbConnect = async (cname) => {
 
 export const collections = {
   USERS: "users",
-  PRODUCTS: "products"
+  PRODUCTS: "products",
+  MYFAVORITES: "myfavorites",
+  MYORDERS: "myorders"
 };

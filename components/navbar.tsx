@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
+import Swal from 'sweetalert2'  
 import {
   Menu,
   X,
@@ -12,15 +13,18 @@ import {
   LayoutDashboard,
   LogOut,
   ChevronDown,
+  Heart,
+  ShoppingBag,  
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Products', href: '/shop' },
+  { label: 'My Orders', href: '/my-orders' },  
   { label: 'About Us', href: '/about' },
   { label: 'Contact', href: '/contact' },
-  { label: 'Privacy Policy', href: '/privacy' },
+  { label: "Privacy Policy", href: "/privacy" },
 ]
 
 export function Navbar() {
@@ -29,6 +33,27 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
+   const handleLogout = () => {
+    setDropdownOpen(false)
+    setMobileOpen(false)
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out of your account!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, Logout!',
+      background: 'var(--card)',
+      color: 'var(--foreground)',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        signOut({ callbackUrl: '/' })
+      }
+    })
+  }
+
   return (
     <nav className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -36,7 +61,8 @@ export function Navbar() {
           ULTIMA<span className="text-primary">-TECH</span>
         </Link>
 
-         <div className="hidden items-center gap-8 lg:flex">
+        {/* Desktop Nav Links */}
+        <div className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => {
             const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
             return (
@@ -58,8 +84,17 @@ export function Navbar() {
           })}
         </div>
 
-         <div className="hidden items-center gap-4 lg:flex">
+        {/* Desktop Actions */}
+        <div className="hidden items-center gap-4 lg:flex">
+          <Link
+            href="/favorites"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary/50 text-muted-foreground transition-all duration-300 hover:border-primary/50 hover:text-primary"
+          >
+            <Heart className="h-5 w-5" />
+          </Link>
+
           <ThemeToggle />
+
           {session ? (
             <div className="relative">
               <button
@@ -72,11 +107,12 @@ export function Navbar() {
                 <span className="text-secondary-foreground">{session.user?.name}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </button>
+              
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-lg border border-border bg-card shadow-xl">
-                  <div className="border-b border-border px-4 py-3">
+                <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-lg border border-border bg-card shadow-xl animate-in fade-in zoom-in duration-200">
+                  <div className="border-b border-border px-4 py-3 bg-muted/30">
                     <p className="text-sm font-medium text-card-foreground">{session.user?.name}</p>
-                    <p className="text-xs text-muted-foreground">{session.user?.email}</p>
+                    <p className="text-xs text-muted-foreground truncate">{session.user?.email}</p>
                   </div>
                   <Link
                     href="/add-product"
@@ -95,11 +131,8 @@ export function Navbar() {
                     Manage Products
                   </Link>
                   <button
-                    onClick={() => {
-                      setDropdownOpen(false)
-                      signOut()
-                    }}
-                    className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-destructive transition-colors hover:bg-secondary"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-destructive transition-colors hover:bg-secondary border-t border-border"
                   >
                     <LogOut className="h-4 w-4" />
                     Logout
@@ -117,47 +150,60 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile & Tab Menu Toggle - এখন 1024px এর নিচে গেলেই (lg:hidden) এটি আসবে */}
+        {/* Mobile Toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="text-foreground lg:hidden"
-          aria-label="Toggle navigation menu"
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile & Tab Menu - 1024px এর নিচের সব ডিভাইসের জন্য */}
+      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background/95 px-6 pb-6 backdrop-blur-xl lg:hidden">
+        <div className="border-t border-border bg-background/95 px-6 pb-6 backdrop-blur-xl lg:hidden animate-in slide-in-from-top duration-300">
           <div className="flex flex-col gap-4 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Theme</span>
-              <ThemeToggle />
-            </div>
-            {navLinks.map((link) => {
-              const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
-              return (
+              <div className="flex items-center gap-3">
                 <Link
-                  key={link.label}
-                  href={link.href}
+                  href="/favorites"
                   onClick={() => setMobileOpen(false)}
-                  className={`text-sm transition-colors ${
-                    isActive
-                      ? 'font-medium text-primary'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary/50 text-muted-foreground"
                 >
-                  {link.label}
+                  <Heart className="h-5 w-5" />
                 </Link>
-              )
-            })}
+                <span className="text-sm font-medium">My Favorites</span>
+              </div>
+              <div className='flex items-center gap-2'>
+              <ThemeToggle />
+                <span className="text-sm font-medium">Theme</span>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              {navLinks.map((link) => {
+                const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`block py-2 text-sm transition-colors ${
+                      isActive ? 'font-semibold text-primary' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              })}
+            </div>
+
             {session ? (
-              <>
+              <div className="space-y-3 pt-2 border-t border-border">
                 <Link
                   href="/add-product"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                   <PlusCircle className="h-4 w-4" />
                   Add Product
@@ -165,22 +211,19 @@ export function Navbar() {
                 <Link
                   href="/manage-products"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   Manage Products
                 </Link>
                 <button
-                  onClick={() => {
-                    setMobileOpen(false)
-                    signOut()
-                  }}
-                  className="flex items-center gap-2 text-sm text-destructive"
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-sm text-destructive font-medium"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout
                 </button>
-              </>
+              </div>
             ) : (
               <Link
                 href="/login"

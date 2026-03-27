@@ -5,24 +5,42 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'  
 import useSWR from 'swr'
 import Swal from 'sweetalert2' 
-import { ArrowLeft, CheckCircle, XCircle, Tag } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Tag, Heart, ShoppingBag } from 'lucide-react'
 import type { Product } from '@/lib/products'
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 export function ProductDetail({ id }: { id: string }) {
-  const router = useRouter() // Router instance
+  const router = useRouter()
   const { data: product, error, isLoading } = useSWR<Product>(`/api/products/${id}`, fetcher)
 
-   const handleAddToCart = () => {
+// Order Now Handler  
+const handleOrderNow = () => {
+  // ১. স্টক চেক
+  if (!product?.inStock) {
     Swal.fire({
-      title: 'Success!',
-      text: `${product?.title} has been added to your cart.`,
+      title: 'Out of Stock',
+      text: 'Sorry, this product is currently unavailable.',
+      icon: 'error',
+    })
+    return
+  }
+
+    // ৩. সব ঠিক থাকলে অর্ডার পেজে পাঠানো
+  router.push(`/order/${id}`) 
+}
+
+
+  // Favourite Handler
+  const handleAddFavourite = () => {
+    Swal.fire({
+      title: 'Added to Favourites!',
+      text: `${product?.title} is now in your wishlist.`,
       icon: 'success',
-      confirmButtonColor: '#3b82f6',  
+      confirmButtonColor: '#ec4899',
       timer: 2000,
       showConfirmButton: false,
-     })
+    })
   }
 
   if (isLoading) {
@@ -50,7 +68,17 @@ export function ProductDetail({ id }: { id: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
+    <div className="mx-auto max-w-7xl px-6 py-6">
+      {/* Professional Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="group mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+      >
+        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card transition-all group-hover:border-primary/50 group-hover:bg-secondary">
+          <ArrowLeft className="h-4 w-4" />
+        </div>
+        Back to Gallery
+      </button>
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* Image Gallery */}
@@ -123,19 +151,21 @@ export function ProductDetail({ id }: { id: string }) {
 
           <div className="h-px bg-border" />
 
-          <div className="flex flex-wrap gap-4">
-            <button 
-              onClick={handleAddToCart} // Click handler
-              className="flex-1 rounded-lg bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:scale-105 hover:bg-primary/90"
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <button  
+              onClick={handleOrderNow}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:bg-primary/90 active:scale-95 shadow-lg shadow-primary/20"
             >
-              Add to Cart
+              <ShoppingBag className="h-5 w-5" />
+              Order Now
             </button>
             <button
-              onClick={() => router.back()}
-              className="rounded-lg border border-border px-8 py-3.5 text-center text-sm font-semibold text-foreground transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:bg-secondary flex items-center gap-2"
+              onClick={handleAddFavourite}
+              className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-8 py-4 text-sm font-bold text-foreground transition-all duration-300 hover:scale-[1.02] hover:border-pink-500/50 hover:bg-pink-500/5 active:scale-95 group"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Go to Back
+              <Heart className="h-5 w-5 transition-colors group-hover:fill-pink-500 group-hover:text-pink-500" />
+              Add to Favourite
             </button>
           </div>
         </div>
