@@ -43,11 +43,12 @@ export default function ShopContent() {
     fetchProducts()
   }, [])
 
-  const filtered = products.filter((p) => {
+ const filtered = Array.isArray(products) ? products.filter((p) => {
     const matchesSearch = p.title?.toLowerCase().includes(search.toLowerCase())
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory
     return matchesSearch && matchesCategory
-  })
+}) : [];
+
 
   if (loading) {
     return (
