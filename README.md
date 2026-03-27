@@ -2,7 +2,7 @@
 
 ### 🌐 Live Link: [https://ultima-tech-ecommerce-niib.vercel.app/](https://ultima-tech-ecommerce-niib.vercel.app/)
 
-![Ultima Tech Banner](public/websiteImg.PNG) 
+![Ultima Tech Banner](/websiteImg.png) 
  
 
 **Ultima Tech** is a high-performance, full-stack e-commerce platform built for the modern gadget enthusiast. Leveraging **Next.js 15**, **MongoDB**, and **NextAuth.js**, it delivers a seamless transition from product discovery to secure checkout and order management.
