@@ -44,7 +44,7 @@ export function Navbar() {
   const favCount = favorites?.length || 0
   const isFavActive = pathname === '/favorites' 
 
-  const handleLogout = () => {
+const handleLogout = () => {
     setDropdownOpen(false)
     setMobileOpen(false)
 
@@ -60,10 +60,31 @@ export function Navbar() {
       color: 'var(--foreground)',
     }).then((result) => {
       if (result.isConfirmed) {
-        signOut({ callbackUrl: '/' })
+         const Toast = Swal.mixin({
+           showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: 'var(--card)',
+          color: 'var(--foreground)',
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        })
+
+         Toast.fire({
+          icon: 'success',
+          title: 'Logged out successfully!'
+        })
+
+         setTimeout(() => {
+          signOut({ callbackUrl: '/' })
+        }, 1800)
       }
     })
   }
+
+
 
   return (
     <nav className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-background/70 backdrop-blur-xl">
