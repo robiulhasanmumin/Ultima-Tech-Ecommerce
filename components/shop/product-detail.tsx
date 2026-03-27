@@ -16,8 +16,7 @@ export function ProductDetail({ id }: { id: string }) {
 
 // Order Now Handler  
 const handleOrderNow = () => {
-  // ১. স্টক চেক
-  if (!product?.inStock) {
+   if (!product?.inStock) {
     Swal.fire({
       title: 'Out of Stock',
       text: 'Sorry, this product is currently unavailable.',
@@ -26,22 +25,60 @@ const handleOrderNow = () => {
     return
   }
 
-    // ৩. সব ঠিক থাকলে অর্ডার পেজে পাঠানো
-  router.push(`/order/${id}`) 
+   router.push(`/order/${id}`) 
 }
 
 
-  // Favourite Handler
-  const handleAddFavourite = () => {
-    Swal.fire({
-      title: 'Added to Favourites!',
-      text: `${product?.title} is now in your wishlist.`,
-      icon: 'success',
-      confirmButtonColor: '#ec4899',
-      timer: 2000,
-      showConfirmButton: false,
-    })
-  }
+// Favourite Handler
+  const handleAddFavourite = async () => {
+    try {
+       const favData = {
+        productId: product?._id,
+        title: product?.title,
+        image: product?.image,
+        price: product?.price,
+        description: product?.description,
+        category: product?.category,
+      };
+
+       const res = await fetch('/api/my-fav', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(favData),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        Swal.fire({
+          title: 'Added to Favourites!',
+          text: `${product?.title} is now in your wishlist.`,
+          icon: 'success',
+          confirmButtonColor: '#ec4899',
+          timer: 2000,
+          showConfirmButton: false,
+          background: '#0f172a',  
+          color: '#fff'
+        });
+      } else {
+         Swal.fire({
+          title: 'Notice',
+          text: result.message || 'Something went wrong',
+          icon: 'info',
+          background: '#0f172a',
+          color: '#fff'
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Failed to add wishlist',
+        icon: 'error',
+      });
+    }
+  };
+
+
 
   if (isLoading) {
     return (
@@ -69,7 +106,7 @@ const handleOrderNow = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-6">
-      {/* Professional Back Button */}
+      {/* Back Button */}
       <button
         onClick={() => router.back()}
         className="group mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
+import useSWR from 'swr'  
 import Swal from 'sweetalert2'  
 import {
   Menu,
@@ -17,6 +18,9 @@ import {
   ShoppingBag,  
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
+
+// Fetcher Function
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -33,7 +37,14 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
-   const handleLogout = () => {
+   const { data: favorites } = useSWR(session ? '/api/my-fav' : null, fetcher, {
+    refreshInterval: 1000  
+  })
+  
+  const favCount = favorites?.length || 0
+  const isFavActive = pathname === '/favorites' 
+
+  const handleLogout = () => {
     setDropdownOpen(false)
     setMobileOpen(false)
 
@@ -86,11 +97,22 @@ export function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-4 lg:flex">
+          {/* Heart Icon with Badge & Active State */}
           <Link
             href="/favorites"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary/50 text-muted-foreground transition-all duration-300 hover:border-primary/50 hover:text-primary"
+            className={`relative flex h-9 w-9 items-center justify-center rounded-lg border transition-all duration-300 ${
+              isFavActive 
+              ? 'border-primary bg-primary/10 text-primary' 
+              : 'border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-primary'
+            }`}
           >
-            <Heart className="h-5 w-5" />
+            <Heart className={`h-5 w-5 transition-colors ${isFavActive ? 'fill-primary text-primary' : ''}`} />
+            
+            {favCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground animate-in zoom-in">
+                {favCount}
+              </span>
+            )}
           </Link>
 
           <ThemeToggle />
@@ -105,6 +127,7 @@ export function Navbar() {
                   {session.user?.name?.charAt(0) || 'U'}
                 </div>
                 <span className="text-secondary-foreground">{session.user?.name}</span>
+                <span className="sr-only">Toggle user menu</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </button>
               
@@ -168,14 +191,23 @@ export function Navbar() {
                 <Link
                   href="/favorites"
                   onClick={() => setMobileOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary/50 text-muted-foreground"
+                  className={`relative flex h-9 w-9 items-center justify-center rounded-lg border ${
+                    isFavActive 
+                    ? 'border-primary bg-primary/10 text-primary' 
+                    : 'border-border bg-secondary/50 text-muted-foreground'
+                  }`}
                 >
-                  <Heart className="h-5 w-5" />
+                  <Heart className={`h-5 w-5 ${isFavActive ? 'fill-primary' : ''}`} />
+                  {favCount > 0 && (
+                    <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                      {favCount}
+                    </span>
+                  )}
                 </Link>
-                <span className="text-sm font-medium">My Favorites</span>
+                <span className={`text-sm font-medium ${isFavActive ? 'text-primary' : ''}`}>My Favorites</span>
               </div>
               <div className='flex items-center gap-2'>
-              <ThemeToggle />
+                <ThemeToggle />
                 <span className="text-sm font-medium">Theme</span>
               </div>
             </div>
