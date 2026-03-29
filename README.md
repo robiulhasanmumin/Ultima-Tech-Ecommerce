@@ -49,6 +49,7 @@
 
 ### 2. Clone & Install
 ```bash
-git clone [https://github.com/robiulhasanmumin/Ultima-Tech-Ecommerce.git](https://github.com/robiulhasanmumin/Ultima-Tech-Ecommerce.git)
-cd ultima-tech
+git clone https://github.com/robiulhasanmumin/Ultima-Tech-Ecommerce.git
+cd Ultima-Tech-Ecommerce
 npm install
+npm run dev 
